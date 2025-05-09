@@ -23,13 +23,15 @@ export class JobsService {
   /**
    * 새로운 작업 생성
    */
-  create(createJobDto: CreateJobDto): Job {
+  async create(createJobDto: CreateJobDto): Promise<Job> {
     const { title, description } = createJobDto;
-
     const id = uuidv4();
     const newJob: Job = { id, title, description, status: 'pending' };
 
-    this.db.push(`/jobs/${id}`, newJob);
+    await this.enqueueWrite(async () => {
+      await Promise.resolve(this.db.push(`/jobs/${id}`, newJob));
+    });
+
     return newJob;
   }
 
@@ -40,7 +42,7 @@ export class JobsService {
     try {
       const jobsObj = (await this.db.getData('/jobs')) as Record<string, Job>;
       return Object.values(jobsObj);
-    } catch (e) {
+    } catch {
       return [];
     }
   }
@@ -50,18 +52,17 @@ export class JobsService {
    */
   async findOne(id: string): Promise<Job> {
     try {
-      return (await this.db.getData(`/jobs/${id}`)) as Promise<Job>;
-    } catch (e) {
+      return (await this.db.getData(`/jobs/${id}`)) as Job;
+    } catch {
       throw new NotFoundException(`ID ${id}에 해당하는 작업이 없습니다.`);
     }
   }
 
   /**
-   * status / title 으로 작업을 검색한다.
+   * 작업 검색 (status / title)
    */
   async search(title?: string, status?: string): Promise<Job[]> {
     const allJobs = await this.findAll();
-
     return allJobs.filter((job) => {
       const matchesTitle = title ? job.title.includes(title) : true;
       const matchesStatus = status ? job.status === status : true;
@@ -70,7 +71,7 @@ export class JobsService {
   }
 
   /**
-   * 상태를 일괄 업데이트 (pending → completed)
+   * 상태 일괄 업데이트 (pending → completed)
    */
   async completePendingJobs(): Promise<Job[]> {
     const jobsObj = (await this.db.getData('/jobs')) as Record<string, Job>;
@@ -78,15 +79,55 @@ export class JobsService {
 
     for (const [id, job] of Object.entries(jobsObj)) {
       if (job.status === 'pending') {
-        const updatedJob: Job = {
-          ...job,
-          status: 'completed',
-        };
-        this.db.push(`/jobs/${id}`, updatedJob, true);
+        const updatedJob: Job = { ...job, status: 'completed' };
+
+        await this.enqueueWrite(async () => {
+          await Promise.resolve(this.db.push(`/jobs/${id}`, updatedJob, true));
+        });
+
         updatedJobs.push(updatedJob);
       }
     }
 
     return updatedJobs;
+  }
+
+  private writeQueue: (() => Promise<void>)[] = [];
+  private isWriting = false;
+
+  private async enqueueWrite(task: () => Promise<void>): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.writeQueue.push(async () => {
+        try {
+          await task();
+          resolve();
+        } catch (e) {
+          reject(e instanceof Error ? e : new Error(String(e)));
+        }
+      });
+
+      if (!this.isWriting) {
+        void this.processQueue();
+      }
+    });
+  }
+
+  private async processQueue() {
+    this.isWriting = true;
+
+    try {
+      while (this.writeQueue.length > 0) {
+        const task = this.writeQueue.shift();
+        if (task) {
+          try {
+            await task();
+          } catch (e) {
+            console.error('작업 실행 중 에러:', e);
+          }
+        }
+      }
+    } finally {
+      this.isWriting = false;
+    }
   }
 }
