@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { JsonDB, Config } from 'node-json-db';
-import { CreateJobDto } from './dto/create-job.dto';
-import { Job } from './entities/job.entity';
+import { CreateJobDto } from '../dto/create-job.dto';
+import { Job } from '../entities/job.entity';
 import * as path from 'path';
 
 @Injectable()
@@ -23,10 +23,6 @@ export class JobsService {
    */
   create(createJobDto: CreateJobDto): Job {
     const { title, description } = createJobDto;
-
-    if (!title || !description) {
-      throw new BadRequestException('title과 description은 필수입니다.');
-    }
 
     const id = uuidv4();
     const newJob: Job = { id, title, description, status: 'pending' };

@@ -8,9 +8,9 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { JobsService } from './jobs.service';
-import { CreateJobDto } from './dto/create-job.dto';
-import { Job } from './entities/job.entity';
+import { JobsService } from '../service/jobs.service';
+import { CreateJobDto } from '../dto/create-job.dto';
+import { Job } from '../entities/job.entity';
 
 @Controller('jobs')
 export class JobsController {

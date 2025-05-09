@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { JobsService } from './jobs.service';
-import { JobsController } from './jobs.controller';
-import { SchedulerService } from './scheduler.service';
+import { JobsService } from './service/jobs.service';
+import { JobsController } from './controller/jobs.controller';
+import { SchedulerService } from './service/scheduler.service';
 
 @Module({
   controllers: [JobsController],
