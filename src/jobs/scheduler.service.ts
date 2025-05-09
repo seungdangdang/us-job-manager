@@ -24,7 +24,7 @@ export class SchedulerService {
       messages.forEach((msg) => this.logger.log(msg));
 
       // logs.txt 기록
-      const logPath = path.join(__dirname, '..', '..', 'logs.txt');
+      const logPath = path.join(process.cwd(), 'src', 'logs', 'logs.txt');
       fs.appendFileSync(logPath, messages.join('\n') + '\n');
     }
   }

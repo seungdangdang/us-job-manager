@@ -7,13 +7,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { JsonDB, Config } from 'node-json-db';
 import { CreateJobDto } from './dto/create-job.dto';
 import { Job } from './entities/job.entity';
+import * as path from 'path';
 
 @Injectable()
 export class JobsService {
   private db: JsonDB;
 
   constructor() {
-    this.db = new JsonDB(new Config('jobs', true, true, '/'));
+    const dbPath = path.join(process.cwd(), 'src', 'db', 'jobs');
+    this.db = new JsonDB(new Config(dbPath, true, true, '/'));
   }
 
   /**
