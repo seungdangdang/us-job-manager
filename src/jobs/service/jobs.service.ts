@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { JsonDB, Config } from 'node-json-db';
 import { CreateJobDto } from '../dto/create-job.dto';
@@ -36,8 +32,8 @@ export class JobsService {
    */
   async findAll(): Promise<Job[]> {
     try {
-      const jobsObj = (await this.db.getData('/jobs')) as Promise<Job[]>;
-      return Object.values(jobsObj) as Job[];
+      const jobsObj = (await this.db.getData('/jobs')) as Record<string, Job>;
+      return Object.values(jobsObj);
     } catch (e) {
       return [];
     }
