@@ -8,7 +8,6 @@ NestJS 기반의 작업(Job) 관리 시스템입니다. <br>
 4. API 유효성 검증 및 예외처리 적용
 
 ## 1. 프로젝트 실행 방법
-***
 ```bash
 npm install
 npm run start
@@ -18,7 +17,6 @@ npm run start
 <br>
 
 ## 2. API 사용법
-***
 ### 2-1. 모든 작업 목록 조회
 [Postman Link - 모든 작업 목록 조회](https://www.postman.com/maintenance-saganist-54947573/us-subject/request/74ipvdd/?tab=overview)
 
@@ -98,7 +96,6 @@ npm run start
 <br>
 
 ## 3. 구현 관련 상세 설명 및 코멘트
-***
 ### 3-1. API 설계 및 처리 전략
 1. 컨트롤러-서비스-DTO-엔티티로 계층 분리
 2. 요청 유효성 검증 (class-validator + ValidationPipe)
@@ -124,14 +121,12 @@ npm run start
 <br>
 
 ## 4. 필수 요구사항 체크리스트
-***
 ✅ jobs.json에 초기 샘플 데이터 세팅 완료</br>
 ✅ Node.js 기본 환경에서 실행 가능하도록 구성
 
 <br>
 
 ## 5. 미구현 사항
-***
 1. status는 현재 문자열(pending, completed)로 관리 중 <br>
    - 실무에서는 enum 또는 숫자 타입(0, 1) 기반 상태 코드 관리가 일반적이나,
      과제 요구사항에서 문자열로 명시되어 있어 이에 맞춰 구현하였음
