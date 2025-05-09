@@ -1,98 +1,141 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Job 관리 백엔드 시스템 (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS 기반의 작업(Job) 관리 시스템입니다. <br>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+1. 작업 생성 및 조회 API
+2. 주기적으로 상태를 변경하는 배치 스케줄러 (pending -> completed)
+3. 파일 기반 JSON 데이터베이스(`node-json-db`) 사용
+4. API 유효성 검증 및 예외처리 적용
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
+## 1. 프로젝트 실행 방법
+***
 ```bash
-$ npm install
+npm install
+npm run start
 ```
+- 서버 주소 (http://localhost:3000)
 
-## Compile and run the project
+<br>
 
-```bash
-# development
-$ npm run start
+## 2. API 사용법
+***
+### 2-1. 모든 작업 목록 조회
+[Postman Link - 모든 작업 목록 조회](https://www.postman.com/maintenance-saganist-54947573/us-subject/request/74ipvdd/?tab=overview)
 
-# watch mode
-$ npm run start:dev
+- Method: GET `/jobs`
+- Response
+    ```
+    [
+        {
+            "id": "ed7fc939-cb82-477e-9211-6c59c0b11a9a",
+            "title": "TEST-1",
+            "description": "test 1",
+            "status": "completed"
+        },
+        {...}
+    ]
+    ```
 
-# production mode
-$ npm run start:prod
-```
+<br>
 
-## Run tests
+### 2-2. 특정 작업 상세 정보 조회
+[Postman Link - 특정 작업 상세 정보 조회](https://www.postman.com/maintenance-saganist-54947573/us-subject/request/fnb108u/?tab=overview)
 
-```bash
-# unit tests
-$ npm run test
+- Method: GET `/jobs/:id`
+- Response
+    ```
+    {
+        "id": "1ee36747-a044-4f6c-818d-fde88dd45e56",
+        "title": "TEST-3",
+        "description": "test 3",
+        "status": "completed"
+    }
+    ```
 
-# e2e tests
-$ npm run test:e2e
+<br>
 
-# test coverage
-$ npm run test:cov
-```
+### 2-3. 작업 조건 검색
+[Postman Link - 작업 조건 검색](https://www.postman.com/maintenance-saganist-54947573/us-subject/request/eciw3ak/)
 
-## Deployment
+- Method: GET `/jobs/search`
+- Params: title (string), status (string)
+- Response
+    ```
+    [
+        {
+            "id": "ed7fc939-cb82-477e-9211-6c59c0b11a9a",
+            "title": "TEST-1",
+            "description": "test 1",
+            "status": "completed"
+        },
+        {...}
+    ]
+    ```
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+<br>
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 2-4. 작업 생성 요청
+[Postman Link - 작업 생성 요청](https://www.postman.com/maintenance-saganist-54947573/us-subject/request/83v27y3/)
+- Method: POST `/jobs`
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- Request Body
+    ```
+    {
+      "title": "TEST-3",
+      "description": "test 3"
+    }
+    ```
+- Response
+    ```
+    {
+        "id": "1ee36747-a044-4f6c-818d-fde88dd45e56",
+        "title": "TEST-3",
+        "description": "test 3",
+        "status": "pending"
+    }
+    ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+<br>
 
-## Resources
+## 3. 구현 관련 상세 설명 및 코멘트
+***
+### 3-1. API 설계 및 처리 전략
+1. 컨트롤러-서비스-DTO-엔티티로 계층 분리
+2. 요청 유효성 검증 (class-validator + ValidationPipe)
 
-Check out a few resources that may come in handy when working with NestJS:
+### 3-2. 데이터 처리 전략
+1. node-json-db를 통해 파일 기반의 데이터 저장 처리
+2. 작업 데이터는 jobs.json에 Record<string, Job> 형태로 저장
+3. 각 작업은 UUID 기반 고유 ID를 사용
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 3-3. 성능 및 스케줄링 전략
+1. @nestjs/schedule 기반 크론 배치 구현
+2. 매 1분마다 상태가 pending인 작업을 자동으로 completed로 전환
+3. 상태 변경 내역은 logs/logs.txt에 자동 기록 (파일 기반 로그)
 
-## Support
+### 3-4. 기타 구현 디테일
+1. 도메인 단위로 controller/, dto/, entites/, service/ 디렉토리를 분리해 책임 명확화
+2. 전역 설정(app.module.ts, main.ts)은 core/ 디렉토리에서 일괄 관리
+3. 테스트 코드는 test/ 디렉토리에서 통합 관리
+4. 파일 경로는 process.cwd() + path.join() 방식으로 절대경로 안전성 확보
+5. 작업 생성 / 업데이트 시 동시성 고려 (write queue로 비동기 write)
+6. 동시성 테스트 코드 작성
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+<br>
 
-## Stay in touch
+## 4. 필수 요구사항 체크리스트
+***
+✅ jobs.json에 초기 샘플 데이터 세팅 완료</br>
+✅ Node.js 기본 환경에서 실행 가능하도록 구성
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+<br>
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 5. 미구현 사항
+***
+1. status는 현재 문자열(pending, completed)로 관리 중 <br>
+   - 실무에서는 enum 또는 숫자 타입(0, 1) 기반 상태 코드 관리가 일반적이나,
+     과제 요구사항에서 문자열로 명시되어 있어 이에 맞춰 구현하였음
+   - 명확한 상태 코드 체계 및 status enum 정의는 향후 확장 시 고려 가능
+2. 조회 성능 최적화 구조 변경 미적용
+   - node-json-db는 데이터를 메모리에 로딩해 처리하므로, 캐시를 추가하더라도 성능 향상 폭이 크지 않음
+   - 실제 10만 건 기준 캐시 적용 전후 조회 속도 차이는 약 5% 내외로, 구조 복잡도 대비 효과가 미비하여 구조 변경은 보류함
