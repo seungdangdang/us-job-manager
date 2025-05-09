@@ -3,14 +3,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { JsonDB, Config } from 'node-json-db';
 import { CreateJobDto } from '../dto/create-job.dto';
 import { Job } from '../entities/job.entity';
+import { ConfigService } from '@nestjs/config';
 import * as path from 'path';
 
 @Injectable()
 export class JobsService {
   private db: JsonDB;
 
-  constructor() {
-    const dbPath = path.join(process.cwd(), 'src', 'db', 'jobs');
+  constructor(private readonly configService: ConfigService) {
+    const dbFile = this.configService.get<string>('JOBS_DB_PATH');
+    if (!dbFile) {
+      throw new Error('JOBS_DB_PATH 환경변수가 설정되지 않았습니다.');
+    }
+
+    const dbPath = path.join(process.cwd(), dbFile);
     this.db = new JsonDB(new Config(dbPath, true, true, '/'));
   }
 
