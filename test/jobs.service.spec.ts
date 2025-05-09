@@ -29,7 +29,7 @@ describe('JobsService', () => {
 
   it('동시에 여러 작업을 생성해도 데이터 손실이 없어야 한다', async () => {
     const tasks = Array.from({ length: 2000 }).map((_, i) => ({
-      title: 'Job-${i}',
+      title: `Job-${i}`,
       description: `Desc-${i}`,
     }));
 
